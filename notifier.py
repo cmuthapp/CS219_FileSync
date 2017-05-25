@@ -3,7 +3,11 @@ from subprocess import call
 
 import pyinotify
 
-##A folder for creating all the v0 versions
+### you can run this script by typing $ python -m notifier.py
+
+
+##A folder for creating all the v0 versions 
+#this folder can be used for storing deltas too. Do not use the same folder as the original file
 syncfolder = "/tmp/syncfolder"
 if not os.path.exists(syncfolder):
 	#print "not exits"
@@ -22,8 +26,8 @@ class EventHandler(pyinotify.ProcessEvent):
         	newfile = event.name+"-v" #+ str(self.i)
     #    	self.i = self.i +1
         	syncfolder = "/tmp/syncfolder/"
-        	if not os.path.isfile(syncfolder+newfile):				##creates copy only if version file is not there
-        		print "hi" 
+        	if not os.path.isfile(syncfolder+newfile):				##creates copy only if previous version file is not there
+        		#print "hi" 
         		call(["cp", event.pathname, syncfolder+newfile])
     #    	print"\n ",newfile
 
@@ -46,6 +50,6 @@ class EventHandler(pyinotify.ProcessEvent):
 handler = EventHandler()
 notifier = pyinotify.Notifier(wm, handler)
 notifier.coalesce_events()
-wdd = wm.add_watch('/home/cmuthapp/cs219/test/', mask, rec=True)
+wdd = wm.add_watch('/home/cmuthapp/cs219/test/', mask, rec=True)   # directory to watch. this can be passed in as parameter if required.
 
 notifier.loop()

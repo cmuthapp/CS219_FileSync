@@ -102,11 +102,11 @@ On client devices, when connected to the server, every time it receives the meta
 \subsection{Server Side}
 \subsection{Client Side}
 When a file that has to be synced is accessed in a device from any application, our system must be alerted of an incoming change. We achieved this functionality by making use of a python library called pyinotify. This package lets us watch for events that can occur in a directory. These events include many events like CREATE, MODIFY, CLOSE and DELETE. Our approach is very straight forward. When a file in the folder that has to be synced is open by any application in the client, we create a copy of the original version containing the data before modification. When the user closes the file after modification, we find the difference between the new modified file and the old original version.
-\section{Difficulties we faced?}
+\section{Difficulties we are facing?}
 \subsection{Server Side}
 \subsection{Client Side}
 
-\section{What is next step?}
+\section{What are the next steps?}
 \subsection{Server Side}
 \begin{itemize}
 \item Lock Service\\

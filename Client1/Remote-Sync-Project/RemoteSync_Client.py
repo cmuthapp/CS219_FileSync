@@ -21,8 +21,6 @@ class RemoteSync(object):
     def __init__(self):
         self.hostname = '192.168.1.15' # remote hostname where SSH server is running
         self.port = 22
-        self.username = 'prajput'
-        self.password = 'Ygaj6dam!'
 
         self.localDirectory = "/home/"+getpass.getuser()+"/RemoteSync/"
 

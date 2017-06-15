@@ -9,6 +9,7 @@ import dill        #pip install dill
 import paramiko #sudo apt-get install python-paramiko
 import hashlib
 import getpass
+import ssl #sudo apt-get install libssl-dev
 
 import os.path
 from subprocess import call
@@ -24,29 +25,37 @@ class Client(object):
         self.USER_IPADDRESS = "192.168.1.14"
         self.PORT = 2122
         self.LOCK = ""
+        self.CERTIFICATE_PATH = '/home/'+ getpass.getuser() +'/Client/SSL_CERT'
 
     def SendData(self, string):
         # SOCK_STREAM == a TCP socket
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        #sock.setblocking(0)  # optional non-blocking
-        sock.connect((self.IPADDRESS, self.PORT))
+        ssl_sock = ssl.wrap_socket(sock,
+                                   ca_certs=self.CERTIFICATE_PATH,
+                                   cert_reqs=ssl.CERT_REQUIRED)
+        ssl_sock.connect((self.IPADDRESS, self.PORT))
 
         print "SENDING DATA => [%s]" % (string)
 
-        sock.send(string)
+        ssl_sock.send(string)
+        ssl_sock.close()
         sock.close()
 
     def SendAndReceiveData(self, string):
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        sock.connect((self.IPADDRESS, self.PORT))
+        ssl_sock = ssl.wrap_socket(sock,
+                                   ca_certs=self.CERTIFICATE_PATH,
+                                   cert_reqs=ssl.CERT_REQUIRED)
+        ssl_sock.connect((self.IPADDRESS, self.PORT))
         print "SENDING DATA => [%s]" % (string)
-        sock.send(string)
+        ssl_sock.send(string)
 
         #Waiting to receive connection back from server
         recv_string = ""
         try:
-            recv_string = sock.recv(1024)
+            recv_string = ssl_sock.recv(1024)
             print "RECEIVED DATA => [%s]" % (recv_string)
+            ssl_sock.close()
             sock.close()
 
         except IOError as (errno, strerror):

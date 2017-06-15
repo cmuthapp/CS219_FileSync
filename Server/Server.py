@@ -3,6 +3,8 @@ import threading
 import hashlib
 import os
 import datetime
+import getpass
+import ssl
 
 from Client import Client
 
@@ -14,6 +16,8 @@ class ThreadedServer(object):
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((self.IPADDRESS, self.PORT))
+        self.CERTIFICATE_PATH = '/home/'+ getpass.getuser() +'/Server/SSL_CERT'
+        self.KEY_PATH = '/home/'+ getpass.getuser() +'/Server/SSL_KEY'
 
     def listen(self):
         self.sock.listen(5)
@@ -24,16 +28,25 @@ class ThreadedServer(object):
 
     def listenToClient(self, client, address):
         size = 1024
+        self.connstream = ssl.wrap_socket(client,
+                                          server_side=True,
+                                          certfile=self.CERTIFICATE_PATH,
+                                          keyfile=self.KEY_PATH,
+                                          ssl_version=ssl.PROTOCOL_SSLv23
+                                          )
         while True:
             try:
-                data = client.recv(size)
+                data = self.connstream.recv(size)
                 if data:
-                    self.ProcessMetaData(data, address[0], client)
+                    self.ProcessMetaData(data, address[0], self.connstream)
                 else:
                     raise error('Client Disconnected')
             except:
                 client.close()
                 return False
+
+        self.connstream.close()
+        client.close()
 
     def ProcessMetaData(self, metaData, targetIP, clientHandler):
         metaList = metaData.split(":")

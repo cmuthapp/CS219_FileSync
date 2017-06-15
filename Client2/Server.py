@@ -7,6 +7,7 @@ import os
 import dill
 import librsync
 from shutil import copyfile
+import ssl
 
 from Client import Client
 from Client import RemoteSync
@@ -19,6 +20,8 @@ class ThreadedServer(object):
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         self.sock.bind((self.IPADDRESS, self.PORT))
         self.tempPath = "/tmp/RemoteSync"
+        self.CERTIFICATE_PATH = '/home/'+ getpass.getuser() +'/Client/SSL_CERT'
+        self.KEY_PATH = '/home/'+ getpass.getuser() +'/Client/SSL_KEY'
 
     def listen(self):
         self.sock.listen(5)
@@ -29,17 +32,27 @@ class ThreadedServer(object):
 
     def listenToClient(self, client, address):
         size = 1024
+        self.connstream = ssl.wrap_socket(client,
+                                          server_side=True,
+                                          certfile=self.CERTIFICATE_PATH,
+                                          keyfile=self.KEY_PATH,
+                                          ssl_version=ssl.PROTOCOL_SSLv23
+                                          )
+
         while True:
             try:
-                data = client.recv(size)
+                data = self.connstream.recv(size)
                 if data:
                     # Print data
                     print "RECEIVED DATA: ",data
                     self.ProcessMetaData(data)
+                    client.close()
+                    self.connstream.close()
                 else:
                     raise error('Client Disconnected')
             except:
                 client.close()
+                self.connstream.close()
                 return False
 
     def ProcessMetaData(self, metaData):

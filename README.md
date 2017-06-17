@@ -11,4 +11,7 @@ Simple File Sync
 
 4. Record the SSH username and password for the client systems.
 
+5. Copy the Server folder to one of the systems. Edit the *Hosts* file with the ip of the client systems and their usernames and passwords.
+
+6. Run the server.py in the Control Server.
 

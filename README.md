@@ -9,6 +9,6 @@ Simple File Sync
 
 3. Open the port 2122 in all the Systems
 
-4.Record the SSH username and password for the client systems.
+4. Record the SSH username and password for the client systems.
 
 
